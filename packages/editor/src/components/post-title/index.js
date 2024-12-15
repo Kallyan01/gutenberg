@@ -99,10 +99,6 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		__unstableDisableFormats: false,
 	} );
 
-	useEffect( () => {}, [ history ] );
-
-	useEffect( () => {}, [ selection, currentHistoryIndex ] );
-
 	useEffect( () => {
 		if ( editorAction !== 'undo' && editorAction !== 'redo' ) {
 			updateHistory( selection.start );
