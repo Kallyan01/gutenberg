@@ -6,7 +6,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { forwardRef, useState } from '@wordpress/element';
+import { forwardRef, useState, useEffect } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -44,13 +44,28 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 
 	const { title, setTitle: onUpdate } = usePostTitle();
 
-	const [ selection, setSelection ] = useState( {} );
+	const [ history, setHistory ] = useState( [] );
+	const [ currentHistoryIndex, setCurrentHistoryIndex ] = useState( -1 );
+	const [ selection, setSelection ] = useState( { start: 0, end: 0 } );
+	const [ editorAction, setEditorAction ] = useState( '' );
 
 	const { clearSelectedBlock, insertBlocks, insertDefaultBlock } =
 		useDispatch( blockEditorStore );
 
 	const decodedPlaceholder =
 		decodeEntities( placeholder ) || __( 'Add title' );
+
+	const updateHistory = ( position ) => {
+		const newHistory = [ ...history ];
+		if ( position !== newHistory[ newHistory.length - 1 ]?.start ) {
+			newHistory.push( {
+				start: position,
+				end: position,
+			} );
+		}
+		setHistory( newHistory );
+		setCurrentHistoryIndex( newHistory.length - 1 );
+	};
 
 	const {
 		value,
@@ -60,6 +75,11 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		value: title,
 		onChange( newValue ) {
 			onUpdate( newValue.replace( REGEXP_NEWLINES, ' ' ) );
+
+			if ( editorAction !== ( 'undo' || 'redo' ) ) {
+				updateHistory( selection.start );
+			}
+			updateHistory( selection.start );
 		},
 		placeholder: decodedPlaceholder,
 		selectionStart: selection.start,
@@ -79,6 +99,16 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		__unstableDisableFormats: false,
 	} );
 
+	useEffect( () => {}, [ history ] );
+
+	useEffect( () => {}, [ selection, currentHistoryIndex ] );
+
+	useEffect( () => {
+		if ( editorAction !== 'undo' && editorAction !== 'redo' ) {
+			updateHistory( selection.start );
+		}
+	}, [ title ] );
+
 	function onInsertBlockAfter( blocks ) {
 		insertBlocks( blocks, 0 );
 	}
@@ -90,18 +120,62 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 
 	function onUnselect() {
 		setIsSelected( false );
-		setSelection( {} );
+		setSelection( { start: 0, end: 0 } );
 	}
 
 	function onEnterPress() {
 		insertDefaultBlock( undefined, undefined, 0 );
 	}
 
+	const undo = () => {
+		if ( currentHistoryIndex > 0 ) {
+			const caretPos = history[ currentHistoryIndex - 1 ];
+
+			setSelection( caretPos );
+			setCurrentHistoryIndex( currentHistoryIndex - 1 );
+		}
+	};
+
+	const redo = () => {
+		if ( currentHistoryIndex < history.length - 1 ) {
+			const caretPos = history[ currentHistoryIndex + 1 ];
+
+			setSelection( caretPos );
+			setCurrentHistoryIndex( currentHistoryIndex + 1 );
+		}
+	};
+
 	function onKeyDown( event ) {
+		// Detect undo (Ctrl+Z or Cmd+Z)
+		if (
+			( event.ctrlKey || event.metaKey ) &&
+			! event.shiftKey &&
+			event.key === 'z'
+		) {
+			event.preventDefault();
+			undo();
+			setEditorAction( 'undo' );
+			return; // Exit to avoid triggering further conditions
+		}
+
+		// Detect redo (Ctrl+Y or Cmd+Shift+Z)
+		if (
+			( event.ctrlKey && event.key === 'y' ) || // Windows/Linux redo
+			( event.metaKey && event.shiftKey && event.key === 'z' ) // macOS redo
+		) {
+			event.preventDefault();
+			redo();
+			setEditorAction( 'redo' );
+			return; // Exit to avoid further processing
+		}
+
 		if ( event.keyCode === ENTER ) {
 			event.preventDefault();
 			onEnterPress();
 		}
+
+		// Set action to 'normal' for all other keys
+		setEditorAction( 'normal' );
 	}
 
 	function onPaste( event ) {
