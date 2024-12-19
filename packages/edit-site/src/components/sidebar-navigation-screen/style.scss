@@ -13,7 +13,7 @@
 	&.has-footer {
 		margin-bottom: 0;
 	}
-	overflow: hidden;
+	overflow: auto;
 }
 
 .edit-site-sidebar-navigation-screen__content {
@@ -58,6 +58,7 @@
 	margin-bottom: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
 	z-index: z-index(".edit-site-sidebar-navigation-screen__sticky-title-section");
+	min-height: 183px !important;
 }
 
 .edit-site-sidebar-navigation-screen__description {

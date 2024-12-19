@@ -79,7 +79,11 @@ export default function SidebarNavigationScreen( {
 					className="edit-site-sidebar-navigation-screen__sticky-title-section"
 					alignment="flex-start"
 				>
-					<HStack spacing={ 3 } alignment="flex-start">
+					<HStack
+						className="edit-site-sidebar-navigation-screen__title-icon"
+						spacing={ 3 }
+						alignment="flex-start"
+					>
 						{ ! isRoot && (
 							<SidebarButton
 								onClick={ () => {
