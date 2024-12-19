@@ -75,52 +75,59 @@ export default function SidebarNavigationScreen( {
 				spacing={ 0 }
 				justify="flex-start"
 			>
-				<HStack
-					spacing={ 3 }
+				<VStack
+					className="edit-site-sidebar-navigation-screen__sticky-title-section"
 					alignment="flex-start"
-					className="edit-site-sidebar-navigation-screen__title-icon"
 				>
-					{ ! isRoot && (
-						<SidebarButton
-							onClick={ () => {
-								history.navigate( backPath );
-								navigate( 'back' );
-							} }
-							icon={ icon }
-							label={ __( 'Back' ) }
-							showTooltip={ false }
-						/>
+					<HStack spacing={ 3 } alignment="flex-start">
+						{ ! isRoot && (
+							<SidebarButton
+								onClick={ () => {
+									history.navigate( backPath );
+									navigate( 'back' );
+								} }
+								icon={ icon }
+								label={ __( 'Back' ) }
+								showTooltip={ false }
+							/>
+						) }
+						{ isRoot && (
+							<SidebarButton
+								icon={ icon }
+								label={
+									dashboardLinkText ||
+									__( 'Go to the Dashboard' )
+								}
+								href={ dashboardLink }
+							/>
+						) }
+						<Heading
+							className="edit-site-sidebar-navigation-screen__title"
+							color={ '#e0e0e0' /* $gray-200 */ }
+							level={ 1 }
+							size={ 20 }
+						>
+							{ ! isPreviewingTheme()
+								? title
+								: sprintf(
+										/* translators: 1: theme name. 2: title */
+										__( 'Previewing %1$s: %2$s' ),
+										previewingThemeName,
+										title
+								  ) }
+						</Heading>
+						{ actions && (
+							<div className="edit-site-sidebar-navigation-screen__actions">
+								{ actions }
+							</div>
+						) }
+					</HStack>
+					{ description && (
+						<p className="edit-site-sidebar-navigation-screen__description">
+							{ description }
+						</p>
 					) }
-					{ isRoot && (
-						<SidebarButton
-							icon={ icon }
-							label={
-								dashboardLinkText || __( 'Go to the Dashboard' )
-							}
-							href={ dashboardLink }
-						/>
-					) }
-					<Heading
-						className="edit-site-sidebar-navigation-screen__title"
-						color={ '#e0e0e0' /* $gray-200 */ }
-						level={ 1 }
-						size={ 20 }
-					>
-						{ ! isPreviewingTheme()
-							? title
-							: sprintf(
-									/* translators: 1: theme name. 2: title */
-									__( 'Previewing %1$s: %2$s' ),
-									previewingThemeName,
-									title
-							  ) }
-					</Heading>
-					{ actions && (
-						<div className="edit-site-sidebar-navigation-screen__actions">
-							{ actions }
-						</div>
-					) }
-				</HStack>
+				</VStack>
 				{ meta && (
 					<>
 						<div className="edit-site-sidebar-navigation-screen__meta">
@@ -130,11 +137,6 @@ export default function SidebarNavigationScreen( {
 				) }
 
 				<div className="edit-site-sidebar-navigation-screen__content">
-					{ description && (
-						<p className="edit-site-sidebar-navigation-screen__description">
-							{ description }
-						</p>
-					) }
 					{ content }
 				</div>
 			</VStack>

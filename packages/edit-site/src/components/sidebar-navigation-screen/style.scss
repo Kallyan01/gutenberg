@@ -13,10 +13,12 @@
 	&.has-footer {
 		margin-bottom: 0;
 	}
+	overflow: hidden;
 }
 
 .edit-site-sidebar-navigation-screen__content {
 	padding: 0 $grid-unit-20;
+	overflow: auto;
 
 	.components-text {
 		color: $gray-400;
@@ -50,14 +52,16 @@
 	}
 }
 
-.edit-site-sidebar-navigation-screen__title-icon {
-	position: sticky;
-	top: 0;
+.edit-site-sidebar-navigation-screen__sticky-title-section {
 	background: $gray-900;
 	padding-top: $grid-unit-60;
 	margin-bottom: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
-	z-index: z-index(".edit-site-sidebar-navigation-screen__title-icon");
+	z-index: z-index(".edit-site-sidebar-navigation-screen__sticky-title-section");
+}
+
+.edit-site-sidebar-navigation-screen__description {
+	padding: $grid-unit-10 $grid-unit-20;
 }
 
 .edit-site-sidebar-navigation-screen__title {
