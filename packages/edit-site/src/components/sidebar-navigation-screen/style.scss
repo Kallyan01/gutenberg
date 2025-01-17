@@ -19,6 +19,7 @@
 .edit-site-sidebar-navigation-screen__content {
 	padding: 0 $grid-unit-30;
 	overflow: auto;
+	@include custom-scrollbars-on-hover(transparent, $gray-700);
 
 	.components-text {
 		color: $gray-400;
